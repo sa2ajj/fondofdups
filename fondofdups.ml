@@ -38,12 +38,6 @@ let fold_left = List.fold_left
 let printf = Printf.printf
 let eprintf = Printf.eprintf
 
-let find_or_default search default =
-    try
-        search ()
-    with Not_found ->
-        default ();;
-
 let handle_file info filename =
     let read_bytes name size =
         let data = open_in_bin name in
@@ -53,6 +47,11 @@ let handle_file info filename =
             close_in data;
             Buffer.contents result in
     let get_digest filename = Digest.file filename in
+    let find_or_default search default =
+        try
+            search ()
+        with Not_found ->
+            default () in
     let find_by_size size info =
         find_or_default (fun () -> FilesBySize.find size info)
                         (fun () -> if size <= small_file_size
