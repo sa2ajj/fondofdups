@@ -44,13 +44,6 @@ let find_or_default search default =
     with Not_found ->
         default ();;
 
-let update_filenames search filename =
-    try
-        let filenames = search () in
-        FileNames.add filename filenames
-    with Not_found ->
-        FileNames.singleton filename;;
-
 let handle_file info filename =
     let read_bytes name size =
         let data = open_in_bin name in
@@ -65,6 +58,12 @@ let handle_file info filename =
                         (fun () -> if size <= small_file_size
                                    then Smallish WithContent.empty
                                    else Largish WithContent.empty) in
+    let update_filenames search filename =
+        try
+            let filenames = search () in
+            FileNames.add filename filenames
+        with Not_found ->
+            FileNames.singleton filename in
     let size = (Unix.stat filename).Unix.st_size in
     match find_by_size size info with
     | Empty empties ->
